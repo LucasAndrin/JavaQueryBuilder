@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/class-diagram
+package Database {
+    package Eloquent {
+        class QueryBuilder {
+            + connection: ConnectionInterface
+            + bindings: HashMap<String, ArrayList>
+
+            + columns: ArrayList<String>
+            + from: String
+            + joins: ArrayList<Join>
+            + wheres: ArrayList<Where>
+            + groups: ArrayList<GroupBy>
+            + orders: ArrayList<OrderBy>
+            + limit: int
+            + offset: int
+
+            + QueryBuilder(ConnectionInterface connection): void
+            + select(): QueryBuilder
+            + select(String[]): QueryBuilder
+            + from(String table): QueryBuilder
+            + from(String table, String as): QueryBuilder
+            + join(String table, String first, String second): QueryBuilder
+            + join(String table, String first, String operator, String second): QueryBuilder
+            + leftJoin(String table, String first, String second): QueryBuilder
+            + leftJoin(String table, String first, String operator, String second): QueryBuilder
+            + rightJoin(String table, String first, String second): QueryBuilder
+            + rightJoin(String table, String first, String operator, String second): QueryBuilder
+            + where(String column, Object value): QueryBuilder
+            + where(String column, String operator, Object value): QueryBuilder
+            + orWhere(String column, Object value): QueryBuilder
+            + orWhere(String column, String operator, Object value): QueryBuilder
+            + whereIn(String column, Object[] values): QueryBuilder
+            + orWhereIn(String column, Object[] values): QueryBuilder
+        }
+
+        abstract class Model {
+            # String connection
+            # String table
+            # String primaryKey
+            # String keyType
+
+            + String getTableName()
+        }
+    }
+}
+
+@enduml
