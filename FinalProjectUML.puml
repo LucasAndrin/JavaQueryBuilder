@@ -1,9 +1,19 @@
 @startuml
 'https://plantuml.com/class-diagram
-package Database {
-    package Eloquent {
+package database {
+    package configuration {
+        class Env {
+            - instance: Dotenv
+            + getInstance(): Dotenv
+            + refresh(): void
+            + get(key: String): String
+            + get(key: String, defaultValue: String): String
+        }
+    }
+
+    package eloquent {
         class QueryBuilder {
-            + connection: ConnectionInterface
+            + connection: Connection
             + bindings: HashMap<String, ArrayList>
 
             + columns: ArrayList<String>

@@ -6,7 +6,7 @@ public class Env {
 
     private static Dotenv instance;
 
-    private static Dotenv getInstance() {
+    private static synchronized Dotenv getInstance() {
         if (instance == null) {
             refresh();
         }
