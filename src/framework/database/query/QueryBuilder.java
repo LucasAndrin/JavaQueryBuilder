@@ -3,15 +3,13 @@ package framework.database.query;
 import framework.database.BuilderContract;
 import framework.database.DatabaseConnection;
 import framework.database.query.grammars.Grammar;
+import framework.database.query.grammars.GrammarContract;
 import framework.database.query.where.WhereBitwise;
 import framework.database.query.where.WhereClause;
 import framework.database.query.where.WhereClosure;
 
-import javax.xml.transform.Result;
 import java.lang.reflect.Array;
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -26,7 +24,7 @@ public class QueryBuilder implements BuilderContract {
     /**
      * The database query grammar instance.
      */
-    public Grammar grammar;
+    public GrammarContract grammar;
 
     /**
      * The valid keys of bindings.

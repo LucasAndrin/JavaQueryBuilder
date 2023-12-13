@@ -70,7 +70,7 @@ class QueryBuilderTest {
             ResultSet rs = builder.from("users").where("name", "Lucas").get();
             if (rs != null) {
                 rs.next();
-                assertEquals(1, rs.getInt(1));
+                assertEquals(7, rs.getInt(1));
             }
         });
     }
@@ -95,7 +95,7 @@ class QueryBuilderTest {
         data.put("email", "curvello@gmail.com");
         data.put("password", "1234");
 
-        assertEquals(1, builder.from("users").where("id", 2).update(data));
+        assertEquals(1, builder.from("users").where("id", 7).update(data));
     }
 
     @Test

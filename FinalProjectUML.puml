@@ -1,58 +1,124 @@
 @startuml
 'https://plantuml.com/class-diagram
-package database {
-    package configuration {
-        class Env {
-            - instance: Dotenv
-            + getInstance(): Dotenv
-            + refresh(): void
-            + get(key: String): String
-            + get(key: String, defaultValue: String): String
-        }
-    }
-
-    package eloquent {
-        class QueryBuilder {
-            + connection: Connection
-            + bindings: HashMap<String, ArrayList>
-
-            + columns: ArrayList<String>
-            + from: String
-            + joins: ArrayList<Join>
-            + wheres: ArrayList<Where>
-            + groups: ArrayList<GroupBy>
-            + orders: ArrayList<OrderBy>
-            + limit: int
-            + offset: int
-
-            + QueryBuilder(ConnectionInterface connection): void
-            + select(): QueryBuilder
-            + select(String[]): QueryBuilder
-            + from(String table): QueryBuilder
-            + from(String table, String as): QueryBuilder
-            + join(String table, String first, String second): QueryBuilder
-            + join(String table, String first, String operator, String second): QueryBuilder
-            + leftJoin(String table, String first, String second): QueryBuilder
-            + leftJoin(String table, String first, String operator, String second): QueryBuilder
-            + rightJoin(String table, String first, String second): QueryBuilder
-            + rightJoin(String table, String first, String operator, String second): QueryBuilder
-            + where(String column, Object value): QueryBuilder
-            + where(String column, String operator, Object value): QueryBuilder
-            + orWhere(String column, Object value): QueryBuilder
-            + orWhere(String column, String operator, Object value): QueryBuilder
-            + whereIn(String column, Object[] values): QueryBuilder
-            + orWhereIn(String column, Object[] values): QueryBuilder
-        }
-
-        abstract class Model {
-            # String connection
-            # String table
-            # String primaryKey
-            # String keyType
-
-            + String getTableName()
-        }
+package configuration {
+    class Env {
+        - instance: Dotenv
+        + getInstance(): Dotenv
+        + refresh(): void
+        + get(key: String): String
+        + get(key: String, defaultValue: String): String
     }
 }
 
+package database {
+    package query {
+        class PostgreSQL {
+
+        }
+
+        class Grammar {
+            # selectComponents: String[]
+        }
+
+        interface GrammarContract {
+            + compileSelect(QueryBuilder query): String
+            + compileInsert(queryBuilder: QueryBuilder, values: Map<String, Object>): String
+            + compileUpdate(queryBuilder: QueryBuilder, values: Map<String, Object>): Object
+            + prepareBindingsForUpdate(bindings: Map<String, List<Object>>, values: Map<String, Object>): List<Object>
+            + compileDelete(query: QueryBuilder): String
+            + prepareBindingsForDelete(bindings: Map<String, List<Object>>): List<Object>
+        }
+
+        class WhereClause {
+            + type: String;
+            + whereOperator: String;
+            + operator: String;
+        }
+
+        class WhereClosure {
+        }
+
+        class WhereBitwise {
+        }
+
+        interface BuilderContract {
+
+        }
+
+        class QueryBuilder {
+            + connection: DatabaseConnection
+            + grammar: GrammarContract
+            - bindingKeys: String[]
+            - bindings: Map<String, List<Object>>
+            + columns: List<String>
+            + distinct: boolean
+            + from: String
+            + joins: List<Object
+            + wheres: List<WhereClause>;
+            + groups: List<Object>
+            + havings: List<Object>
+            + orders: List<Object>
+            + limit: int
+            + offset: int
+            + unions: List<Object>
+            + unionLimit: int
+            + unionOffset: int
+            + unionOrders: List<Object>
+            + lock: boolean
+            + operators: String[]
+
+            + select(): QueryBuilder
+            + select(column: String): QueryBuilder
+            + select(columns: String[]): QueryBuilder
+            + from(table: String): QueryBuilder
+            + from(table: String, as: String): QueryBuilder
+            + where(column: String, value: Object): QueryBuilder
+            + where(column: String, operator: String, value: Object): QueryBuilder
+            + where(callback: QueryClosure): QueryBuilder
+            + whereNested(callback: QueryClosure, operator: String): QueryBuilder
+            + orWhere(callback: QueryClosure): QueryBuilder
+            + addBinding(value: Object, type: String): QueryBuilder
+            + getBinding(key: String): List<Object>
+            + get(): ResultSet
+            + get(columns: String[]): ResultSet
+            + insert(values: Map<String, Object>): int
+            + update(values: Map<String, Object>): int
+            + delete(): int
+            + delete(id: long): int
+            + toSql(): String
+        }
+    }
+
+    interface ConnectionContract {
+        + select(query: String, bindings: List<Object>): ResultSet
+        + insert(query: String, bindings: List<Object>): int
+        + update(query: String, bindings: List<Object>): int
+        + delete(query: String, bindings: List<Object>): int
+    }
+
+    abstract DatabaseConnection {
+        connection: Connection
+        # bind(PreparedStatement ps, List<?> bindings): int
+        # bind(PreparedStatement ps, List<?> bindings, int index): int
+    }
+
+    class DatabaseConnector {
+        - connection: DatabaseConnection
+        + getConnection(): DatabaseConnection
+        + connect(): void
+    }
+}
+
+GrammarContract <|.. Grammar
+
+WhereClause <|-- WhereClosure
+WhereClause <|-- WhereBitwise
+
+QueryBuilder <.. WhereClause
+BuilderContract <|.. QueryBuilder
+
+ConnectionContract <|.. DatabaseConnection
+PostgreSQL --|> DatabaseConnection
+DatabaseConnector ..> DatabaseConnection
+Env ..> DatabaseConnector
 @enduml
